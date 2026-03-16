@@ -1,0 +1,1 @@
+/Users/fulopkovacs/dev-projects/2025/todo-app-client/AGENTS.md

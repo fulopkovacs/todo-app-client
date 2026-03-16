@@ -62,3 +62,20 @@ All tests are in `__test__/`.
 
 - Prefer functions over arrow functions for React components and everything else
 - Prefer `type`-s over `interface`-s
+
+<!-- intent-skills:start -->
+# Skill mappings - when working in these areas, load the linked skill file into context.
+skills:
+  - task: "Using React hooks for live queries and data fetching (useLiveQuery, useLiveSuspenseQuery, useLiveInfiniteQuery)"
+    load: "node_modules/@tanstack/react-db/skills/react-db/SKILL.md"
+  - task: "Setting up or modifying TanStack DB collections, adapters, and sync config"
+    load: "node_modules/.pnpm/@tanstack+db@0.5.33_typescript@5.9.3/node_modules/@tanstack/db/skills/db-core/SKILL.md"
+  - task: "Setting up collections with createCollection, adapter selection, or schema config"
+    load: "node_modules/.pnpm/@tanstack+db@0.5.33_typescript@5.9.3/node_modules/@tanstack/db/skills/db-core/collection-setup/SKILL.md"
+  - task: "Building live queries with the query builder (from, where, join, select, orderBy, limit)"
+    load: "node_modules/.pnpm/@tanstack+db@0.5.33_typescript@5.9.3/node_modules/@tanstack/db/skills/db-core/live-queries/SKILL.md"
+  - task: "Optimistic mutations, inserts, updates, deletes, transactions, and paced mutations"
+    load: "node_modules/.pnpm/@tanstack+db@0.5.33_typescript@5.9.3/node_modules/@tanstack/db/skills/db-core/mutations-optimistic/SKILL.md"
+  - task: "Integrating TanStack DB with TanStack Start (SSR, route preloading, collection lifecycle)"
+    load: "node_modules/.pnpm/@tanstack+db@0.5.33_typescript@5.9.3/node_modules/@tanstack/db/skills/meta-framework/SKILL.md"
+<!-- intent-skills:end -->

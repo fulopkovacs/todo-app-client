@@ -283,7 +283,7 @@ export const todoItemsCollection = createCollection<TodoItemRecord>(
     queryFn: async ({ meta }) => {
       const params = new URLSearchParams();
 
-      if (meta) {
+      if (meta?.loadSubsetOptions) {
         const { where } = meta.loadSubsetOptions;
 
         // Parse the expressions into simple format
