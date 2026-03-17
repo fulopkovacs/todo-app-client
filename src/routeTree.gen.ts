@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as MobileRouteImport } from './routes/mobile'
 import { Route as TutorialRouteImport } from './routes/_tutorial'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiTodoItemsRouteImport } from './routes/api/todo-items'
+import { Route as ApiProjectsRouteImport } from './routes/api/projects'
+import { Route as ApiBoardsRouteImport } from './routes/api/boards'
 import { Route as TutorialDbRouteImport } from './routes/_tutorial._db'
 import { Route as TutorialDbProjectsRouteImport } from './routes/_tutorial._db.projects'
 import { Route as TutorialDbProjectRootRouteImport } from './routes/_tutorial._db.project-root'
@@ -30,6 +33,21 @@ const TutorialRoute = TutorialRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTodoItemsRoute = ApiTodoItemsRouteImport.update({
+  id: '/api/todo-items',
+  path: '/api/todo-items',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiProjectsRoute = ApiProjectsRouteImport.update({
+  id: '/api/projects',
+  path: '/api/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiBoardsRoute = ApiBoardsRouteImport.update({
+  id: '/api/boards',
+  path: '/api/boards',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TutorialDbRoute = TutorialDbRouteImport.update({
@@ -61,6 +79,9 @@ const TutorialDbProjectsProjectIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/mobile': typeof MobileRoute
+  '/api/boards': typeof ApiBoardsRoute
+  '/api/projects': typeof ApiProjectsRoute
+  '/api/todo-items': typeof ApiTodoItemsRoute
   '/project-root': typeof TutorialDbProjectRootRoute
   '/projects': typeof TutorialDbProjectsRouteWithChildren
   '/projects/$projectId': typeof TutorialDbProjectsProjectIdRoute
@@ -69,6 +90,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/mobile': typeof MobileRoute
+  '/api/boards': typeof ApiBoardsRoute
+  '/api/projects': typeof ApiProjectsRoute
+  '/api/todo-items': typeof ApiTodoItemsRoute
   '/project-root': typeof TutorialDbProjectRootRoute
   '/projects/$projectId': typeof TutorialDbProjectsProjectIdRoute
   '/projects': typeof TutorialDbProjectsIndexRoute
@@ -79,6 +103,9 @@ export interface FileRoutesById {
   '/_tutorial': typeof TutorialRouteWithChildren
   '/mobile': typeof MobileRoute
   '/_tutorial/_db': typeof TutorialDbRouteWithChildren
+  '/api/boards': typeof ApiBoardsRoute
+  '/api/projects': typeof ApiProjectsRoute
+  '/api/todo-items': typeof ApiTodoItemsRoute
   '/_tutorial/_db/project-root': typeof TutorialDbProjectRootRoute
   '/_tutorial/_db/projects': typeof TutorialDbProjectsRouteWithChildren
   '/_tutorial/_db/projects/$projectId': typeof TutorialDbProjectsProjectIdRoute
@@ -89,18 +116,32 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/mobile'
+    | '/api/boards'
+    | '/api/projects'
+    | '/api/todo-items'
     | '/project-root'
     | '/projects'
     | '/projects/$projectId'
     | '/projects/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/mobile' | '/project-root' | '/projects/$projectId' | '/projects'
+  to:
+    | '/'
+    | '/mobile'
+    | '/api/boards'
+    | '/api/projects'
+    | '/api/todo-items'
+    | '/project-root'
+    | '/projects/$projectId'
+    | '/projects'
   id:
     | '__root__'
     | '/'
     | '/_tutorial'
     | '/mobile'
     | '/_tutorial/_db'
+    | '/api/boards'
+    | '/api/projects'
+    | '/api/todo-items'
     | '/_tutorial/_db/project-root'
     | '/_tutorial/_db/projects'
     | '/_tutorial/_db/projects/$projectId'
@@ -111,6 +152,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   TutorialRoute: typeof TutorialRouteWithChildren
   MobileRoute: typeof MobileRoute
+  ApiBoardsRoute: typeof ApiBoardsRoute
+  ApiProjectsRoute: typeof ApiProjectsRoute
+  ApiTodoItemsRoute: typeof ApiTodoItemsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -125,7 +169,7 @@ declare module '@tanstack/react-router' {
     '/_tutorial': {
       id: '/_tutorial'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof TutorialRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -136,10 +180,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/todo-items': {
+      id: '/api/todo-items'
+      path: '/api/todo-items'
+      fullPath: '/api/todo-items'
+      preLoaderRoute: typeof ApiTodoItemsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/projects': {
+      id: '/api/projects'
+      path: '/api/projects'
+      fullPath: '/api/projects'
+      preLoaderRoute: typeof ApiProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/boards': {
+      id: '/api/boards'
+      path: '/api/boards'
+      fullPath: '/api/boards'
+      preLoaderRoute: typeof ApiBoardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_tutorial/_db': {
       id: '/_tutorial/_db'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof TutorialDbRouteImport
       parentRoute: typeof TutorialRoute
     }
@@ -217,6 +282,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   TutorialRoute: TutorialRouteWithChildren,
   MobileRoute: MobileRoute,
+  ApiBoardsRoute: ApiBoardsRoute,
+  ApiProjectsRoute: ApiProjectsRoute,
+  ApiTodoItemsRoute: ApiTodoItemsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,17 +1,8 @@
-import { PGlite } from "@electric-sql/pglite";
-import { drizzle } from "drizzle-orm/pglite";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 
-const dbName = import.meta.env.DEV
-  ? "idb://DEV-trytanstackdb"
-  : "idb://trytanstackdb";
+const client = postgres(process.env.DATABASE_URL!);
 
-/** The name of the IndexedDB database used by PGlite */
-export const idbName = `/pglite/${dbName.replace("idb://", "")}`;
-
-export const client = new PGlite(dbName);
-
-export const db = drizzle({
-  client,
-});
+export const db = drizzle({ client });
 
 export type DB = typeof db;

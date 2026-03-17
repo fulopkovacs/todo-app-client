@@ -3,7 +3,7 @@ import { queryCollectionOptions } from "@tanstack/query-db-collection";
 import { toast } from "sonner";
 import type { TodoItemRecord } from "@/db/schema";
 import * as TanstackQuery from "@/integrations/tanstack-query/root-provider";
-import type { TodoItemCreateDataType } from "@/local-api/api.todo-items";
+import type { TodoItemCreateDataType } from "@/routes/api/todo-items";
 import {
   TODO_ITEMS_SYNC_STATE_ID,
   todoItemsSyncCollection,

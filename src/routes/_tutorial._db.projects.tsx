@@ -1,5 +1,4 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { ApiRequestsPanel } from "@/components/ApiRequestsPanel";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Header } from "@/components/Header";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -18,7 +17,6 @@ function MainLayout() {
           <AppSidebar />
           <Outlet />
         </div>
-        <ApiRequestsPanel />
       </div>
     </main>
   );

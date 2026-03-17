@@ -2,21 +2,16 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import {
-  ClientOnly,
   createRootRouteWithContext,
   HeadContent,
   redirect,
-  ScriptOnce,
   Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { RotateCwIcon, TriangleAlertIcon } from "lucide-react";
-import { useCallback, useState } from "react";
+import { TriangleAlertIcon } from "lucide-react";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Toaster } from "@/components/ui/sonner";
-import { client, idbName } from "@/db";
 import { getIsMobile } from "@/server/functions/getIsMobile";
 import { seo } from "@/utils/seo";
 import appCss from "../styles.css?url";
@@ -84,71 +79,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   errorComponent: ErrorComponent,
 });
 
-function RemoveDB() {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const [showReloadButton, setShowReloadButton] = useState(false);
-
-  const removeDB = useCallback(async () => {
-    if (typeof window !== "undefined" && "indexedDB" in window) {
-      try {
-        console.log({ idbName });
-        await client.close();
-        const request = window.indexedDB.deleteDatabase(idbName);
-        request.onsuccess = () => {
-          window.location.reload();
-        };
-        request.onerror = () => {
-          const errorMessage = "Failed to delete database";
-          console.error(errorMessage);
-          setErrorMessage(errorMessage);
-        };
-        request.onblocked = () => {
-          setShowReloadButton(true);
-          const errorMessage =
-            "Database deletion blocked - close other tabs using this site. If this site is not open in other tabs, try refreshing the page.";
-          setErrorMessage(errorMessage);
-          console.warn(errorMessage);
-        };
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "An unknown error occurred";
-        console.error("Error deleting database:", errorMessage);
-        setErrorMessage(errorMessage);
-      }
-    }
-  }, []);
-
-  return (
-    <ClientOnly>
-      <Button
-        className="w-fit mx-auto"
-        variant="destructive"
-        onClick={removeDB}
-      >
-        <RotateCwIcon /> Reset the db
-      </Button>
-      <p className="text-destructive font-bold text-center">{errorMessage}</p>
-      {showReloadButton && (
-        <Button
-          className="mx-auto"
-          variant="outline"
-          onClick={() => {
-            window.location.reload();
-          }}
-        >
-          Reload page
-        </Button>
-      )}
-    </ClientOnly>
-  );
-}
-
 function ErrorComponent({ error }: { error: unknown }) {
-  const isServiceWorkerError =
-    error instanceof Error &&
-    error.message.includes("navigator.serviceWorker.addEventListener");
-
   const isDbQueryError =
     error instanceof Error && error.message.startsWith("Failed query: ");
 
@@ -162,26 +93,11 @@ function ErrorComponent({ error }: { error: unknown }) {
         </CardHeader>
 
         <CardContent className="flex flex-col gap-4">
-          {isServiceWorkerError ? (
-            <>
-              <p className="block sm:hidden">
-                Embedded browsers (like those in some social media apps) might
-                not support Service Workers properly.
-              </p>
-              <p className="hidden sm:block">
-                It seems like your browser is having issues with Service
-                Workers. Please try using a different browser or updating your
-                current one.
-              </p>
-            </>
-          ) : isDbQueryError ? (
-            <>
-              <p>
-                There was an issue executing a database query. Please ensure
-                that the backend server is running and accessible.
-              </p>
-              <RemoveDB />
-            </>
+          {isDbQueryError ? (
+            <p>
+              There was an issue executing a database query. Please ensure that
+              the backend server is running and accessible.
+            </p>
           ) : null}
           <p className="font-bold">Error message:</p>
           <pre className="wrap-break-word whitespace-pre-wrap text max-h-40 text-muted-foreground overflow-y-auto">
@@ -193,44 +109,6 @@ function ErrorComponent({ error }: { error: unknown }) {
   );
 }
 
-function ServiceWorkerLoader() {
-  const serviceWorkerScript = (() => {
-    const registerServiceWorker = async () => {
-      const serviceWorkerLoadedVarName = "__SERVICE_WORKER_LOADED__";
-      // @ts-expect-error
-      if (!window[serviceWorkerLoadedVarName]) {
-        if ("serviceWorker" in navigator) {
-          try {
-            const registration = await navigator.serviceWorker.register(
-              "/sw.js",
-              {
-                scope: "/",
-                type: "module",
-              },
-            );
-            if (registration.installing) {
-              console.log("Service worker installing");
-            } else if (registration.waiting) {
-              console.log("Service worker installed");
-            } else if (registration.active) {
-              console.log("Service worker active");
-            }
-          } catch (error) {
-            console.error(`Registration failed with ${error}`);
-          }
-        }
-        // @ts-expect-error
-        window[serviceWorkerLoadedVarName] = true;
-      }
-    };
-
-    registerServiceWorker();
-    return `(${registerServiceWorker.toString()})();`;
-  })();
-
-  return <ScriptOnce children={serviceWorkerScript} />;
-}
-
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning className="overflow-hidden!">
@@ -238,7 +116,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <ServiceWorkerLoader />
         <ThemeProvider>
           {children}
           <Toaster position="top-right" />
