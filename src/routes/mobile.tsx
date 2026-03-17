@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { HomeIntro } from "@/components/HomeIntro";
 
 export const Route = createFileRoute("/mobile")({
   component: RouteComponent,
@@ -7,8 +6,10 @@ export const Route = createFileRoute("/mobile")({
 
 function RouteComponent() {
   return (
-    <div className="min-h-screen bg-background">
-      <HomeIntro activeStep={null} showIntro={true} isMobile={true} />
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <p className="text-muted-foreground">
+        This app is not available on mobile devices.
+      </p>
     </div>
   );
 }

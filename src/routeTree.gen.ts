@@ -9,31 +9,39 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as MobileRouteImport } from './routes/mobile'
-import { Route as TutorialRouteImport } from './routes/_tutorial'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
+import { Route as ProjectsProjectIdRouteImport } from './routes/projects.$projectId'
 import { Route as ApiTodoItemsRouteImport } from './routes/api/todo-items'
 import { Route as ApiProjectsRouteImport } from './routes/api/projects'
 import { Route as ApiBoardsRouteImport } from './routes/api/boards'
-import { Route as TutorialDbRouteImport } from './routes/_tutorial._db'
-import { Route as TutorialDbProjectsRouteImport } from './routes/_tutorial._db.projects'
-import { Route as TutorialDbProjectRootRouteImport } from './routes/_tutorial._db.project-root'
-import { Route as TutorialDbProjectsIndexRouteImport } from './routes/_tutorial._db.projects.index'
-import { Route as TutorialDbProjectsProjectIdRouteImport } from './routes/_tutorial._db.projects.$projectId'
 
+const ProjectsRoute = ProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MobileRoute = MobileRouteImport.update({
   id: '/mobile',
   path: '/mobile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TutorialRoute = TutorialRouteImport.update({
-  id: '/_tutorial',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProjectsRoute,
+} as any)
+const ProjectsProjectIdRoute = ProjectsProjectIdRouteImport.update({
+  id: '/$projectId',
+  path: '/$projectId',
+  getParentRoute: () => ProjectsRoute,
 } as any)
 const ApiTodoItemsRoute = ApiTodoItemsRouteImport.update({
   id: '/api/todo-items',
@@ -50,42 +58,16 @@ const ApiBoardsRoute = ApiBoardsRouteImport.update({
   path: '/api/boards',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TutorialDbRoute = TutorialDbRouteImport.update({
-  id: '/_db',
-  getParentRoute: () => TutorialRoute,
-} as any)
-const TutorialDbProjectsRoute = TutorialDbProjectsRouteImport.update({
-  id: '/projects',
-  path: '/projects',
-  getParentRoute: () => TutorialDbRoute,
-} as any)
-const TutorialDbProjectRootRoute = TutorialDbProjectRootRouteImport.update({
-  id: '/project-root',
-  path: '/project-root',
-  getParentRoute: () => TutorialDbRoute,
-} as any)
-const TutorialDbProjectsIndexRoute = TutorialDbProjectsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => TutorialDbProjectsRoute,
-} as any)
-const TutorialDbProjectsProjectIdRoute =
-  TutorialDbProjectsProjectIdRouteImport.update({
-    id: '/$projectId',
-    path: '/$projectId',
-    getParentRoute: () => TutorialDbProjectsRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/mobile': typeof MobileRoute
+  '/projects': typeof ProjectsRouteWithChildren
   '/api/boards': typeof ApiBoardsRoute
   '/api/projects': typeof ApiProjectsRoute
   '/api/todo-items': typeof ApiTodoItemsRoute
-  '/project-root': typeof TutorialDbProjectRootRoute
-  '/projects': typeof TutorialDbProjectsRouteWithChildren
-  '/projects/$projectId': typeof TutorialDbProjectsProjectIdRoute
-  '/projects/': typeof TutorialDbProjectsIndexRoute
+  '/projects/$projectId': typeof ProjectsProjectIdRoute
+  '/projects/': typeof ProjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -93,34 +75,29 @@ export interface FileRoutesByTo {
   '/api/boards': typeof ApiBoardsRoute
   '/api/projects': typeof ApiProjectsRoute
   '/api/todo-items': typeof ApiTodoItemsRoute
-  '/project-root': typeof TutorialDbProjectRootRoute
-  '/projects/$projectId': typeof TutorialDbProjectsProjectIdRoute
-  '/projects': typeof TutorialDbProjectsIndexRoute
+  '/projects/$projectId': typeof ProjectsProjectIdRoute
+  '/projects': typeof ProjectsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_tutorial': typeof TutorialRouteWithChildren
   '/mobile': typeof MobileRoute
-  '/_tutorial/_db': typeof TutorialDbRouteWithChildren
+  '/projects': typeof ProjectsRouteWithChildren
   '/api/boards': typeof ApiBoardsRoute
   '/api/projects': typeof ApiProjectsRoute
   '/api/todo-items': typeof ApiTodoItemsRoute
-  '/_tutorial/_db/project-root': typeof TutorialDbProjectRootRoute
-  '/_tutorial/_db/projects': typeof TutorialDbProjectsRouteWithChildren
-  '/_tutorial/_db/projects/$projectId': typeof TutorialDbProjectsProjectIdRoute
-  '/_tutorial/_db/projects/': typeof TutorialDbProjectsIndexRoute
+  '/projects/$projectId': typeof ProjectsProjectIdRoute
+  '/projects/': typeof ProjectsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/mobile'
+    | '/projects'
     | '/api/boards'
     | '/api/projects'
     | '/api/todo-items'
-    | '/project-root'
-    | '/projects'
     | '/projects/$projectId'
     | '/projects/'
   fileRoutesByTo: FileRoutesByTo
@@ -130,28 +107,24 @@ export interface FileRouteTypes {
     | '/api/boards'
     | '/api/projects'
     | '/api/todo-items'
-    | '/project-root'
     | '/projects/$projectId'
     | '/projects'
   id:
     | '__root__'
     | '/'
-    | '/_tutorial'
     | '/mobile'
-    | '/_tutorial/_db'
+    | '/projects'
     | '/api/boards'
     | '/api/projects'
     | '/api/todo-items'
-    | '/_tutorial/_db/project-root'
-    | '/_tutorial/_db/projects'
-    | '/_tutorial/_db/projects/$projectId'
-    | '/_tutorial/_db/projects/'
+    | '/projects/$projectId'
+    | '/projects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  TutorialRoute: typeof TutorialRouteWithChildren
   MobileRoute: typeof MobileRoute
+  ProjectsRoute: typeof ProjectsRouteWithChildren
   ApiBoardsRoute: typeof ApiBoardsRoute
   ApiProjectsRoute: typeof ApiProjectsRoute
   ApiTodoItemsRoute: typeof ApiTodoItemsRoute
@@ -159,18 +132,18 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/projects': {
+      id: '/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mobile': {
       id: '/mobile'
       path: '/mobile'
       fullPath: '/mobile'
       preLoaderRoute: typeof MobileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_tutorial': {
-      id: '/_tutorial'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof TutorialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -179,6 +152,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/projects/': {
+      id: '/projects/'
+      path: '/'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof ProjectsIndexRouteImport
+      parentRoute: typeof ProjectsRoute
+    }
+    '/projects/$projectId': {
+      id: '/projects/$projectId'
+      path: '/$projectId'
+      fullPath: '/projects/$projectId'
+      preLoaderRoute: typeof ProjectsProjectIdRouteImport
+      parentRoute: typeof ProjectsRoute
     }
     '/api/todo-items': {
       id: '/api/todo-items'
@@ -201,87 +188,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiBoardsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_tutorial/_db': {
-      id: '/_tutorial/_db'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof TutorialDbRouteImport
-      parentRoute: typeof TutorialRoute
-    }
-    '/_tutorial/_db/projects': {
-      id: '/_tutorial/_db/projects'
-      path: '/projects'
-      fullPath: '/projects'
-      preLoaderRoute: typeof TutorialDbProjectsRouteImport
-      parentRoute: typeof TutorialDbRoute
-    }
-    '/_tutorial/_db/project-root': {
-      id: '/_tutorial/_db/project-root'
-      path: '/project-root'
-      fullPath: '/project-root'
-      preLoaderRoute: typeof TutorialDbProjectRootRouteImport
-      parentRoute: typeof TutorialDbRoute
-    }
-    '/_tutorial/_db/projects/': {
-      id: '/_tutorial/_db/projects/'
-      path: '/'
-      fullPath: '/projects/'
-      preLoaderRoute: typeof TutorialDbProjectsIndexRouteImport
-      parentRoute: typeof TutorialDbProjectsRoute
-    }
-    '/_tutorial/_db/projects/$projectId': {
-      id: '/_tutorial/_db/projects/$projectId'
-      path: '/$projectId'
-      fullPath: '/projects/$projectId'
-      preLoaderRoute: typeof TutorialDbProjectsProjectIdRouteImport
-      parentRoute: typeof TutorialDbProjectsRoute
-    }
   }
 }
 
-interface TutorialDbProjectsRouteChildren {
-  TutorialDbProjectsProjectIdRoute: typeof TutorialDbProjectsProjectIdRoute
-  TutorialDbProjectsIndexRoute: typeof TutorialDbProjectsIndexRoute
+interface ProjectsRouteChildren {
+  ProjectsProjectIdRoute: typeof ProjectsProjectIdRoute
+  ProjectsIndexRoute: typeof ProjectsIndexRoute
 }
 
-const TutorialDbProjectsRouteChildren: TutorialDbProjectsRouteChildren = {
-  TutorialDbProjectsProjectIdRoute: TutorialDbProjectsProjectIdRoute,
-  TutorialDbProjectsIndexRoute: TutorialDbProjectsIndexRoute,
+const ProjectsRouteChildren: ProjectsRouteChildren = {
+  ProjectsProjectIdRoute: ProjectsProjectIdRoute,
+  ProjectsIndexRoute: ProjectsIndexRoute,
 }
 
-const TutorialDbProjectsRouteWithChildren =
-  TutorialDbProjectsRoute._addFileChildren(TutorialDbProjectsRouteChildren)
-
-interface TutorialDbRouteChildren {
-  TutorialDbProjectRootRoute: typeof TutorialDbProjectRootRoute
-  TutorialDbProjectsRoute: typeof TutorialDbProjectsRouteWithChildren
-}
-
-const TutorialDbRouteChildren: TutorialDbRouteChildren = {
-  TutorialDbProjectRootRoute: TutorialDbProjectRootRoute,
-  TutorialDbProjectsRoute: TutorialDbProjectsRouteWithChildren,
-}
-
-const TutorialDbRouteWithChildren = TutorialDbRoute._addFileChildren(
-  TutorialDbRouteChildren,
-)
-
-interface TutorialRouteChildren {
-  TutorialDbRoute: typeof TutorialDbRouteWithChildren
-}
-
-const TutorialRouteChildren: TutorialRouteChildren = {
-  TutorialDbRoute: TutorialDbRouteWithChildren,
-}
-
-const TutorialRouteWithChildren = TutorialRoute._addFileChildren(
-  TutorialRouteChildren,
+const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
+  ProjectsRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  TutorialRoute: TutorialRouteWithChildren,
   MobileRoute: MobileRoute,
+  ProjectsRoute: ProjectsRouteWithChildren,
   ApiBoardsRoute: ApiBoardsRoute,
   ApiProjectsRoute: ApiProjectsRoute,
   ApiTodoItemsRoute: ApiTodoItemsRoute,

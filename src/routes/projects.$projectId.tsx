@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { EditableProjectDetails } from "@/components/EditableProjectDetails";
 import { TodoBoards } from "@/components/TodoBoards";
 
-export const Route = createFileRoute("/_tutorial/_db/projects/$projectId")({
+export const Route = createFileRoute("/projects/$projectId")({
   component: RouteComponent,
 });
 

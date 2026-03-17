@@ -12,7 +12,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useAppForm } from "@/hooks/app.form";
-import { HighlightWrapper } from "@/utils/highlight-collection-related-info";
 import { Skeleton } from "./ui/skeleton";
 
 function EditProjectNamePopover({ name, id }: { name: string; id: string }) {
@@ -31,39 +30,37 @@ function EditProjectNamePopover({ name, id }: { name: string; id: string }) {
   });
 
   return (
-    <HighlightWrapper highlightId="editProject">
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <Edit2Icon />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-80">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              form.handleSubmit(e);
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <Edit2Icon />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit(e);
+          }}
+          className="flex items-center gap-2"
+        >
+          <form.AppField
+            name="name"
+            validators={{
+              onSubmit: ({ value }) => {
+                if (value.trim().length === 0) {
+                  return "Project name cannot be empty";
+                }
+              },
             }}
-            className="flex items-center gap-2"
-          >
-            <form.AppField
-              name="name"
-              validators={{
-                onSubmit: ({ value }) => {
-                  if (value.trim().length === 0) {
-                    return "Project name cannot be empty";
-                  }
-                },
-              }}
-              children={(field) => <field.TextField label="New name" />}
-            />
-            <Button className="self-end ml-auto" type="submit" size="icon">
-              <CheckIcon />
-            </Button>
-          </form>
-        </PopoverContent>
-      </Popover>
-    </HighlightWrapper>
+            children={(field) => <field.TextField label="New name" />}
+          />
+          <Button className="self-end ml-auto" type="submit" size="icon">
+            <CheckIcon />
+          </Button>
+        </form>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -142,26 +139,24 @@ export function EditableProjectDetails({ projectId }: { projectId: string }) {
       <p>Please select a project from the sidebar!</p>
     </div>
   ) : (
-    <HighlightWrapper highlightId="project_projectPage">
-      <div className="flex flex-col mb-6 gap-1">
-        <div className="flex items-center gap-2">
-          {isLoading ? (
-            <div className="flex items-center h-9">
-              <Skeleton className="h-8 w-40" />
-            </div>
-          ) : (
-            <>
-              <h1 className="scroll-m-20 text-2xl font-bold">{project.name}</h1>
-              <EditProjectNamePopover name={project.name} id={project.id} />
-            </>
-          )}
-        </div>
+    <div className="flex flex-col mb-6 gap-1">
+      <div className="flex items-center gap-2">
         {isLoading ? (
-          <Skeleton className="h-6 block w-80" />
+          <div className="flex items-center h-9">
+            <Skeleton className="h-8 w-40" />
+          </div>
         ) : (
-          <p className="text-muted-foreground">{project.description}</p>
+          <>
+            <h1 className="scroll-m-20 text-2xl font-bold">{project.name}</h1>
+            <EditProjectNamePopover name={project.name} id={project.id} />
+          </>
         )}
       </div>
-    </HighlightWrapper>
+      {isLoading ? (
+        <Skeleton className="h-6 block w-80" />
+      ) : (
+        <p className="text-muted-foreground">{project.description}</p>
+      )}
+    </div>
   );
 }

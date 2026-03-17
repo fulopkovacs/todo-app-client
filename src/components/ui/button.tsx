@@ -20,7 +20,6 @@ const buttonVariants = cva(
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-input dark:hover:text-current",
         link: "text-primary underline-offset-4 hover:underline",
         empty: "text-current",
-        tutorial: "text-primary hover:brightness-[80%] text-black rounded-full",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

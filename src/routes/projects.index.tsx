@@ -1,7 +1,7 @@
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
 import type { ProjectRecord } from "@/db/schema";
 
-export const Route = createFileRoute("/_tutorial/_db/projects/")({
+export const Route = createFileRoute("/projects/")({
   beforeLoad: async () => {
     const res = await fetch("/api/projects");
     if (!res.ok) {

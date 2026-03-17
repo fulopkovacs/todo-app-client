@@ -17,7 +17,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { HighlightWrapper } from "@/utils/highlight-collection-related-info";
 import {
   Collapsible,
   CollapsibleContent,
@@ -62,65 +61,61 @@ export function AppSidebar() {
             <SidebarMenu>
               <Collapsible defaultOpen className="group/collapsible">
                 <SidebarMenuItem>
-                  <HighlightWrapper highlightId="project_sidebar">
-                    <CollapsibleTrigger asChild className="flex items-center">
-                      <SidebarMenuButton className={cn("grow")}>
-                        <FolderClosedIcon />
-                        <span>
-                          Projects{" "}
-                          {!isLoadingProjects && (
-                            <span>({projects.length})</span>
-                          )}
-                        </span>
-                        {/* <SidebarMenuBadge>{boards.length}</SidebarMenuBadge> */}
-                        <ChevronDownIcon className="ml-auto transition-transform duration-200 ease-in-out group-data-[state=open]/collapsible:rotate-180" />
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <SidebarMenuSub>
-                        {isLoadingProjects &&
-                          Array.from({ length: 3 }).map((_, idx) => (
-                            <SidebarMenuSubItem key={idx}>
-                              <SidebarMenuSubButton>
-                                <Skeleton className="h-(--text-base) w-40" />
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        {projects.map((project) => (
-                          <SidebarMenuSubItem key={project.id}>
-                            <SidebarMenuSubButton
-                              asChild
-                              isActive={params.projectId === project.id}
-                            >
-                              <Link
-                                preload={
-                                  /*
+                  <CollapsibleTrigger asChild className="flex items-center">
+                    <SidebarMenuButton className={cn("grow")}>
+                      <FolderClosedIcon />
+                      <span>
+                        Projects{" "}
+                        {!isLoadingProjects && <span>({projects.length})</span>}
+                      </span>
+                      {/* <SidebarMenuBadge>{boards.length}</SidebarMenuBadge> */}
+                      <ChevronDownIcon className="ml-auto transition-transform duration-200 ease-in-out group-data-[state=open]/collapsible:rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {isLoadingProjects &&
+                        Array.from({ length: 3 }).map((_, idx) => (
+                          <SidebarMenuSubItem key={idx}>
+                            <SidebarMenuSubButton>
+                              <Skeleton className="h-(--text-base) w-40" />
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      {projects.map((project) => (
+                        <SidebarMenuSubItem key={project.id}>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={params.projectId === project.id}
+                          >
+                            <Link
+                              preload={
+                                /*
                       NOTE: People will probably check the network
                     requests to see how TanStack DB works, so it's
                     the best if don't confuse them by preloading
                       data on link hovers etc.
                       */
-                                  false
+                                false
+                              }
+                              to="/projects/$projectId"
+                              params={{ projectId: project.id }}
+                              style={
+                                {
+                                  // fontWeight:
+                                  //   selectedProject === project ? "bold" : "normal",
+                                  // color:
+                                  //   selectedProject === project ? "#2563eb" : "inherit",
                                 }
-                                to="/projects/$projectId"
-                                params={{ projectId: project.id }}
-                                style={
-                                  {
-                                    // fontWeight:
-                                    //   selectedProject === project ? "bold" : "normal",
-                                    // color:
-                                    //   selectedProject === project ? "#2563eb" : "inherit",
-                                  }
-                                }
-                              >
-                                {project.name}
-                              </Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                      </SidebarMenuSub>
-                    </CollapsibleContent>
-                  </HighlightWrapper>
+                              }
+                            >
+                              {project.name}
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
                 </SidebarMenuItem>
               </Collapsible>
             </SidebarMenu>
