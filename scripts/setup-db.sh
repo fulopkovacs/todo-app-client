@@ -70,11 +70,11 @@ pnpm db:generate
 
 # Apply migrations
 step "Applying database migrations..."
-pnpm db:migrate
+pnpm db:dev:migrate
 
 # Running the seed command
 step "Seeding the database with initial data..."
-pnpm db:seed
+pnpm db:dev:seed
 
 # # Create the first admin user
 # step "Creating initial admin user..."
