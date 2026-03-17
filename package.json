@@ -14,8 +14,11 @@
     "deploy:prod": "vite build && wrangler deploy",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate && tsx src/db/compile-migrations.ts",
-    "db:migrate": "drizzle-kit migrate",
-    "db:seed": "tsx src/db/seed.ts",
+    "db:dev:push": "drizzle-kit push",
+    "db:dev:migrate": "ENV_FILE=.env drizzle-kit migrate",
+    "db:dev:seed": "tsx src/db/seed.ts",
+    "db:prod:migrate": "ENV_FILE=.env.production drizzle-kit migrate",
+    "db:prod:seed": "ENV_FILE=.env.production tsx src/db/seed.ts",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
     "knip": "knip"
   },

@@ -4,7 +4,6 @@ dist
 dist-ssr
 *.local
 count.txt
-.env
 .nitro
 .tanstack
 .wrangler
@@ -17,3 +16,8 @@ todos.json
 notes.md
 .memelord/
 .codemogger
+
+# .env files
+.env
+.env.local
+.env.production

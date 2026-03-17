@@ -1,6 +1,8 @@
 // Generate a seed script
 
-import "dotenv/config";
+import { config } from "dotenv";
+
+config({ path: process.env.ENV_FILE || ".env" });
 
 import { generateKeyBetween } from "fractional-indexing";
 import { nanoid } from "nanoid";
