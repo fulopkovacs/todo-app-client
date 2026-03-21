@@ -393,7 +393,7 @@ export function TodoBoards({ projectId }: { projectId: string }) {
   );
 
   // Fetch all todo items for the project in a single query
-  const { data: allTodoItems } = useLiveQuery(
+  const { data: allTodoItems, isLoading: isLoadingTodoItems } = useLiveQuery(
     (q) =>
       q
         .from({ todoItem: todoItemsCollection })
@@ -405,54 +405,7 @@ export function TodoBoards({ projectId }: { projectId: string }) {
     [projectId],
   );
 
-  // Track projects that have completed loading (not just started)
-  const loadedProjectsRef = useRef<Set<string>>(new Set());
-  const unsubscribeRef = useRef<(() => void) | undefined>(undefined);
-
-  const [showTodoItemsLoading, setShowTodoItemsLoading] =
-    useState<boolean>(false);
-
-  useEffect(() => {
-    // Clean up previous subscription synchronously before creating a new one
-    if (unsubscribeRef.current) {
-      unsubscribeRef.current();
-      unsubscribeRef.current = undefined;
-    }
-
-    // If project already loaded, no need to show loading or subscribe
-    if (loadedProjectsRef.current.has(projectId)) {
-      setShowTodoItemsLoading(false);
-      return;
-    }
-
-    // If we have items or not loading, mark as loaded
-    if (allTodoItems.length > 0 || !todoItemsCollection.isLoadingSubset) {
-      loadedProjectsRef.current.add(projectId);
-      setShowTodoItemsLoading(false);
-      return;
-    }
-
-    // Items are empty and still loading - show skeleton and subscribe
-    setShowTodoItemsLoading(true);
-
-    const currentProjectId = projectId;
-    unsubscribeRef.current = todoItemsCollection.on(
-      "loadingSubset:change",
-      (event) => {
-        if (event.loadingSubsetTransition === "end") {
-          loadedProjectsRef.current.add(currentProjectId);
-          setShowTodoItemsLoading(false);
-        }
-      },
-    );
-
-    return () => {
-      if (unsubscribeRef.current) {
-        unsubscribeRef.current();
-        unsubscribeRef.current = undefined;
-      }
-    };
-  }, [projectId, allTodoItems.length]);
+  const showTodoItemsLoading = isLoadingTodoItems && allTodoItems.length === 0;
 
   // Get active todo item from already-loaded collection data
   // instead of making a separate query

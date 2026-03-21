@@ -3,7 +3,6 @@ import { seed } from "./seed";
 
 config({ path: process.env.ENV_FILE || ".env" });
 
-import { sql } from "drizzle-orm";
 import { db } from ".";
 import {
   boardsTable,
@@ -23,11 +22,6 @@ async function reset() {
     await tx.delete(projectsTable);
     await tx.delete(usersTable);
     await tx.delete(seedTable);
-  });
-
-  // Reset Electric sync state so it picks up fresh data
-  await db.execute(sql`DELETE FROM electric.shadow WHERE true`).catch(() => {
-    // electric schema may not exist, that's fine
   });
 
   console.log("Database reset complete. Re-seeding...");

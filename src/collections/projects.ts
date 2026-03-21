@@ -1,9 +1,8 @@
-import { snakeCamelMapper } from "@electric-sql/client";
-import { electricCollectionOptions } from "@tanstack/electric-db-collection";
+import { queryCollectionOptions } from "@tanstack/query-db-collection";
 import { createCollection } from "@tanstack/react-db";
 import { toast } from "sonner";
 import { z } from "zod";
-import { PROXY_URL_BASE } from "@/PROXY_URL_BASE";
+import { queryCollectionClient } from "@/collections/queryClient";
 import type { ProjectUpdateData } from "@/routes/api/projects";
 import { projectErrorNames } from "@/utils/errorNames";
 
@@ -22,12 +21,26 @@ const projectSchema = z.object({
 });
 
 export const projectsCollection = createCollection(
-  electricCollectionOptions({
-    schema: projectSchema,
-    shapeOptions: {
-      url: `${PROXY_URL_BASE}/projects`,
-      parser: { timestamptz: (v: string) => new Date(v) },
-      columnMapper: snakeCamelMapper(),
+  queryCollectionOptions({
+    id: "projects",
+    queryKey: ["projects"],
+    queryClient: queryCollectionClient,
+    queryFn: async () => {
+      const res = await fetch("/api/projects");
+
+      if (res.status === 404) {
+        toast.error("Projects not found");
+        throw new ProjectsNotFoundFromAPIError(
+          "Projects endpoint returned 404",
+        );
+      }
+
+      if (!res.ok) {
+        toast.error("Failed to fetch projects");
+        throw new Error("Failed to fetch projects");
+      }
+
+      return z.array(projectSchema).parse(await res.json());
     },
     onUpdate: async ({ transaction }) => {
       const { original, changes } = transaction.mutations[0];
@@ -43,6 +56,7 @@ export const projectsCollection = createCollection(
 
         if (!res.ok) {
           const errorData = await res.text();
+          toast.error(`Failed to update project "${original.name}"`);
           throw new Error(errorData);
         }
 
