@@ -370,7 +370,12 @@ export async function seed() {
 }
 
 // Allow running directly via `pnpm db:seed`
-seed().then((result) => {
-  console.log("Seeding complete:", result);
-  process.exit(0);
-});
+const isDirectRun =
+  process.argv[1]?.endsWith("seed.ts") || process.argv[1]?.endsWith("seed.js");
+
+if (isDirectRun) {
+  seed().then((result) => {
+    console.log("Seeding complete:", result);
+    process.exit(0);
+  });
+}
