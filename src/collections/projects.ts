@@ -60,8 +60,7 @@ export const projectsCollection = createCollection(
           throw new Error(errorData);
         }
 
-        const data: { txid: number } = await res.json();
-        return { txid: data.txid };
+        return;
       } catch (error) {
         if (
           error instanceof Error &&

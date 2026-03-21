@@ -45,8 +45,7 @@ export const todoItemsCollection = createCollection(
         throw new Error("Failed to insert todo item");
       }
 
-      const data: { txid: number } = await res.json();
-      return { txid: data.txid };
+      return;
     },
     onDelete: async ({ transaction }) => {
       const { original } = transaction.mutations[0];
@@ -62,8 +61,7 @@ export const todoItemsCollection = createCollection(
         throw new Error("Failed to delete todo item");
       }
 
-      const data: { txid: number } = await res.json();
-      return { txid: data.txid };
+      return;
     },
     onUpdate: async ({ transaction }) => {
       const { modified } = transaction.mutations[0];
@@ -86,8 +84,7 @@ export const todoItemsCollection = createCollection(
         throw new Error("Failed to update todo item");
       }
 
-      const data: { txid: number } = await res.json();
-      return { txid: data.txid };
+      return;
     },
     getKey: (item) => item.id,
   }),
