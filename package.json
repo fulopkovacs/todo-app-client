@@ -4,7 +4,6 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --port 3600 --strictPort false",
-    "dev:prod": "vite dev --port 3600 --strictPort false --mode production",
     "build": "vite build",
     "serve": "vite preview",
     "test": "vitest run",
@@ -13,11 +12,8 @@
     "check": "biome check",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:dev:push": "drizzle-kit push",
-    "db:dev:migrate": "ENV_FILE=.env drizzle-kit migrate",
-    "db:dev:seed": "tsx src/db/seed.ts",
-    "db:prod:migrate": "ENV_FILE=.env.production drizzle-kit migrate",
-    "db:prod:seed": "ENV_FILE=.env.production tsx src/db/seed.ts",
+    "db:push": "drizzle-kit push",
+    "db:seed": "tsx src/db/seed.ts",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
     "knip": "knip"
   },
