@@ -100,6 +100,48 @@ export const Route = createFileRoute("/api/todo-items")({
           headers: { "Content-Type": "application/json" },
         });
       },
+      DELETE: async ({ request }) => {
+        // biome-ignore lint/suspicious/noExplicitAny: it can be any here
+        let bodyObj: any;
+
+        try {
+          bodyObj = await request.json();
+        } catch (e) {
+          console.error("Error parsing JSON body:", e);
+          return new Response("Invalid JSON body", { status: 400 });
+        }
+
+        const parsed = z.object({ id: z.string().min(1) }).safeParse(bodyObj);
+        if (!parsed.success) {
+          return new Response("Invalid request data", { status: 400 });
+        }
+
+        let txid: number | undefined;
+
+        await db.transaction(async (tx) => {
+          const deleted = await tx
+            .delete(todoItemsTable)
+            .where(eq(todoItemsTable.id, parsed.data.id))
+            .returning();
+
+          if (deleted.length === 0) {
+            throw new Error("Todo item not found");
+          }
+
+          const [txResult] = await tx.execute<{ txid: string }>(
+            sql`SELECT pg_current_xact_id()::text as txid`,
+          );
+          txid = Number(txResult.txid);
+        });
+
+        if (txid === undefined) {
+          return new Response("Todo item not found", { status: 404 });
+        }
+
+        return new Response(JSON.stringify({ txid }), {
+          headers: { "Content-Type": "application/json" },
+        });
+      },
       PATCH: async ({ request }) => {
         let updatedData: z.infer<typeof todoItemUpdateData>;
 
