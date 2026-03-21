@@ -21,3 +21,6 @@ notes.md
 .env
 .env.local
 .env.production
+
+# configs for my db client
+.dbs.lua
