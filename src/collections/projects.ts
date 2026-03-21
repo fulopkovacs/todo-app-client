@@ -3,9 +3,9 @@ import { electricCollectionOptions } from "@tanstack/electric-db-collection";
 import { createCollection } from "@tanstack/react-db";
 import { toast } from "sonner";
 import { z } from "zod";
+import { PROXY_URL_BASE } from "@/PROXY_URL_BASE";
 import type { ProjectUpdateData } from "@/routes/api/projects";
 import { projectErrorNames } from "@/utils/errorNames";
-import { PROXY_URL_BASE } from "@/PROXY_URL_BASE";
 
 export class ProjectsNotFoundFromAPIError extends Error {
   constructor(message: string) {

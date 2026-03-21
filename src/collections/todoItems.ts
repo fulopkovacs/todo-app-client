@@ -43,6 +43,23 @@ export const todoItemsCollection = createCollection(
       const data: { txid: number } = await res.json();
       return { txid: data.txid };
     },
+    onDelete: async ({ transaction }) => {
+      const { original } = transaction.mutations[0];
+
+      const res = await fetch("/api/todo-items", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: original.id }),
+      });
+
+      if (!res.ok) {
+        toast.error(`Failed to delete todo item "${original.title}"`);
+        throw new Error("Failed to delete todo item");
+      }
+
+      const data: { txid: number } = await res.json();
+      return { txid: data.txid };
+    },
     onUpdate: async ({ transaction }) => {
       const { modified } = transaction.mutations[0];
 

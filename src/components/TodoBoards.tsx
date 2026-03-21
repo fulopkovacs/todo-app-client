@@ -20,6 +20,7 @@ import {
   LoaderIcon,
   PlusIcon,
   SquarePenIcon,
+  Trash2Icon,
 } from "lucide-react";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { Virtualizer } from "virtua";
@@ -34,6 +35,17 @@ import {
   LoadingTasksOnBoardSkeleton,
   TodoBoardsLoading,
 } from "./TodoBoardsLoading";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import {
@@ -120,7 +132,7 @@ const TaskBase = forwardRef<
         </CardTitle>
         <CardDescription>{task.description}</CardDescription>
       </CardHeader>
-      <CardFooter className="flex justify-center">
+      <CardFooter className="flex justify-center gap-1">
         {
           <CreateOrEditTodoItems todoItem={task}>
             <Button
@@ -137,6 +149,41 @@ const TaskBase = forwardRef<
             </Button>
           </CreateOrEditTodoItems>
         }
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              onPointerDown={handlePriorityPointerDown}
+              onKeyDownCapture={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+              }}
+              variant="ghost"
+              size="sm"
+              className="cursor-pointer text-muted-foreground hover:text-destructive"
+            >
+              <Trash2Icon /> Delete
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete task</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete &ldquo;{task.title}&rdquo;? This
+                action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  todoItemsCollection.delete(task.id);
+                }}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardFooter>
     </Card>
   );
