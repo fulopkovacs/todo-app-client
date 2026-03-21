@@ -164,7 +164,7 @@ const TaskBase = forwardRef<
               <Trash2Icon /> Delete
             </Button>
           </AlertDialogTrigger>
-          <AlertDialogContent>
+          <AlertDialogContent onPointerDown={(e) => e.stopPropagation()}>
             <AlertDialogHeader>
               <AlertDialogTitle>Delete task</AlertDialogTitle>
               <AlertDialogDescription>
