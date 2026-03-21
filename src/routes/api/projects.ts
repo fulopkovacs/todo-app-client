@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
 import { projectsTable } from "@/db/schema";
@@ -9,9 +9,6 @@ const projectUpdateData = z.object({
   id: z.string(),
   name: z.string().optional(),
   description: z.string().optional(),
-  itemPositionsInTheProject: z
-    .record(z.string(), z.array(z.string()))
-    .optional(),
 });
 
 export type ProjectUpdateData = z.infer<typeof projectUpdateData>;
@@ -61,11 +58,27 @@ export const Route = createFileRoute("/api/projects")({
           return new Response("No columns to update", { status: 400 });
         }
 
+        let txid: number | undefined;
+
         try {
-          await db
-            .update(projectsTable)
-            .set(updatedData)
-            .where(eq(projectsTable.id, updatedData.id));
+          const { id: _id, ...updateFields } = updatedData;
+
+          await db.transaction(async (tx) => {
+            const [updated] = await tx
+              .update(projectsTable)
+              .set(updateFields)
+              .where(eq(projectsTable.id, updatedData.id))
+              .returning({ id: projectsTable.id });
+
+            if (!updated) {
+              throw new Error(`Project not found: ${updatedData.id}`);
+            }
+
+            const [txResult] = await tx.execute<{ txid: string }>(
+              sql`SELECT pg_current_xact_id()::text as txid`,
+            );
+            txid = Number(txResult.txid);
+          });
         } catch (error) {
           if (
             error instanceof Error &&
@@ -86,7 +99,7 @@ export const Route = createFileRoute("/api/projects")({
           );
         }
 
-        return new Response(JSON.stringify({ updated: "ok" }), {
+        return new Response(JSON.stringify({ txid }), {
           headers: { "Content-Type": "application/json" },
         });
       },

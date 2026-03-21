@@ -1,24 +1,25 @@
-import { createCollection } from "@tanstack/db";
-import { queryCollectionOptions } from "@tanstack/query-db-collection";
-import type { BoardRecord } from "@/db/schema";
-import * as TanstackQuery from "@/integrations/tanstack-query/root-provider";
+import { snakeCamelMapper } from "@electric-sql/client";
+import { electricCollectionOptions } from "@tanstack/electric-db-collection";
+import { createCollection } from "@tanstack/react-db";
+import { z } from "zod";
+import { PROXY_URL_BASE } from "@/PROXY_URL_BASE";
 
-async function getBoards() {
-  const res = await fetch("/api/boards");
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch boards");
-  }
-
-  const data = await res.json();
-  return data as BoardRecord[];
-}
+const boardSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.union([z.string(), z.null()]),
+  createdAt: z.coerce.date(),
+  projectId: z.string(),
+});
 
 export const boardCollection = createCollection(
-  queryCollectionOptions({
-    queryKey: ["boards"],
-    queryFn: getBoards,
-    queryClient: TanstackQuery.getContext().queryClient,
+  electricCollectionOptions({
+    schema: boardSchema,
+    shapeOptions: {
+      url: `${PROXY_URL_BASE}/api/electric/boards`,
+      parser: { timestamptz: (v: string) => new Date(v) },
+      columnMapper: snakeCamelMapper(),
+    },
     getKey: (item) => item.id,
   }),
 );
