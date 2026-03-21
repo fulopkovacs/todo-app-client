@@ -16,7 +16,7 @@ export const boardCollection = createCollection(
   electricCollectionOptions({
     schema: boardSchema,
     shapeOptions: {
-      url: `${PROXY_URL_BASE}/api/electric/boards`,
+      url: `${PROXY_URL_BASE}/boards`,
       parser: { timestamptz: (v: string) => new Date(v) },
       columnMapper: snakeCamelMapper(),
     },

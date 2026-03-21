@@ -22,7 +22,7 @@ export const todoItemsCollection = createCollection(
     id: "todo-items",
     schema: todoItemSchema,
     shapeOptions: {
-      url: `${PROXY_URL_BASE}/api/electric/todo-items`,
+      url: `${PROXY_URL_BASE}/todo-items`,
       parser: { timestamptz: (v: string) => new Date(v) },
       columnMapper: snakeCamelMapper(),
     },

@@ -25,7 +25,7 @@ export const projectsCollection = createCollection(
   electricCollectionOptions({
     schema: projectSchema,
     shapeOptions: {
-      url: `${PROXY_URL_BASE}/api/electric/projects`,
+      url: `${PROXY_URL_BASE}/projects`,
       parser: { timestamptz: (v: string) => new Date(v) },
       columnMapper: snakeCamelMapper(),
     },
