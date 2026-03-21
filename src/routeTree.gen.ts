@@ -17,9 +17,6 @@ import { Route as ProjectsProjectIdRouteImport } from './routes/projects.$projec
 import { Route as ApiTodoItemsRouteImport } from './routes/api/todo-items'
 import { Route as ApiProjectsRouteImport } from './routes/api/projects'
 import { Route as ApiBoardsRouteImport } from './routes/api/boards'
-import { Route as ApiElectricTodoItemsRouteImport } from './routes/api/electric/todo-items'
-import { Route as ApiElectricProjectsRouteImport } from './routes/api/electric/projects'
-import { Route as ApiElectricBoardsRouteImport } from './routes/api/electric/boards'
 
 const ProjectsRoute = ProjectsRouteImport.update({
   id: '/projects',
@@ -61,21 +58,6 @@ const ApiBoardsRoute = ApiBoardsRouteImport.update({
   path: '/api/boards',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiElectricTodoItemsRoute = ApiElectricTodoItemsRouteImport.update({
-  id: '/api/electric/todo-items',
-  path: '/api/electric/todo-items',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiElectricProjectsRoute = ApiElectricProjectsRouteImport.update({
-  id: '/api/electric/projects',
-  path: '/api/electric/projects',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiElectricBoardsRoute = ApiElectricBoardsRouteImport.update({
-  id: '/api/electric/boards',
-  path: '/api/electric/boards',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -86,9 +68,6 @@ export interface FileRoutesByFullPath {
   '/api/todo-items': typeof ApiTodoItemsRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/projects/': typeof ProjectsIndexRoute
-  '/api/electric/boards': typeof ApiElectricBoardsRoute
-  '/api/electric/projects': typeof ApiElectricProjectsRoute
-  '/api/electric/todo-items': typeof ApiElectricTodoItemsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -98,9 +77,6 @@ export interface FileRoutesByTo {
   '/api/todo-items': typeof ApiTodoItemsRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/projects': typeof ProjectsIndexRoute
-  '/api/electric/boards': typeof ApiElectricBoardsRoute
-  '/api/electric/projects': typeof ApiElectricProjectsRoute
-  '/api/electric/todo-items': typeof ApiElectricTodoItemsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -112,9 +88,6 @@ export interface FileRoutesById {
   '/api/todo-items': typeof ApiTodoItemsRoute
   '/projects/$projectId': typeof ProjectsProjectIdRoute
   '/projects/': typeof ProjectsIndexRoute
-  '/api/electric/boards': typeof ApiElectricBoardsRoute
-  '/api/electric/projects': typeof ApiElectricProjectsRoute
-  '/api/electric/todo-items': typeof ApiElectricTodoItemsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -127,9 +100,6 @@ export interface FileRouteTypes {
     | '/api/todo-items'
     | '/projects/$projectId'
     | '/projects/'
-    | '/api/electric/boards'
-    | '/api/electric/projects'
-    | '/api/electric/todo-items'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -139,9 +109,6 @@ export interface FileRouteTypes {
     | '/api/todo-items'
     | '/projects/$projectId'
     | '/projects'
-    | '/api/electric/boards'
-    | '/api/electric/projects'
-    | '/api/electric/todo-items'
   id:
     | '__root__'
     | '/'
@@ -152,9 +119,6 @@ export interface FileRouteTypes {
     | '/api/todo-items'
     | '/projects/$projectId'
     | '/projects/'
-    | '/api/electric/boards'
-    | '/api/electric/projects'
-    | '/api/electric/todo-items'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -164,9 +128,6 @@ export interface RootRouteChildren {
   ApiBoardsRoute: typeof ApiBoardsRoute
   ApiProjectsRoute: typeof ApiProjectsRoute
   ApiTodoItemsRoute: typeof ApiTodoItemsRoute
-  ApiElectricBoardsRoute: typeof ApiElectricBoardsRoute
-  ApiElectricProjectsRoute: typeof ApiElectricProjectsRoute
-  ApiElectricTodoItemsRoute: typeof ApiElectricTodoItemsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -227,27 +188,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiBoardsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/electric/todo-items': {
-      id: '/api/electric/todo-items'
-      path: '/api/electric/todo-items'
-      fullPath: '/api/electric/todo-items'
-      preLoaderRoute: typeof ApiElectricTodoItemsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/electric/projects': {
-      id: '/api/electric/projects'
-      path: '/api/electric/projects'
-      fullPath: '/api/electric/projects'
-      preLoaderRoute: typeof ApiElectricProjectsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/electric/boards': {
-      id: '/api/electric/boards'
-      path: '/api/electric/boards'
-      fullPath: '/api/electric/boards'
-      preLoaderRoute: typeof ApiElectricBoardsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -272,9 +212,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiBoardsRoute: ApiBoardsRoute,
   ApiProjectsRoute: ApiProjectsRoute,
   ApiTodoItemsRoute: ApiTodoItemsRoute,
-  ApiElectricBoardsRoute: ApiElectricBoardsRoute,
-  ApiElectricProjectsRoute: ApiElectricProjectsRoute,
-  ApiElectricTodoItemsRoute: ApiElectricTodoItemsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -6,6 +6,4 @@ A todo app extracted from [fulopkovacs/trytanstackdb.com](https://github.com/ful
 
 ## Notes
 
-Electric has an official [TanStack DB Web Starter repo](https://github.com/electric-sql/electric/tree/main/examples/tanstack-db-web-starter).
-
-I created this repo for a YouTube video, so it's not a proper reference for setting up a TanStack Start app with TanStack DB and Electric.
+I created this repo for a YouTube video, so it's not a proper reference app.
