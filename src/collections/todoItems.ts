@@ -3,8 +3,8 @@ import { electricCollectionOptions } from "@tanstack/electric-db-collection";
 import { createCollection } from "@tanstack/react-db";
 import { toast } from "sonner";
 import { z } from "zod";
-import type { TodoItemCreateDataType } from "@/routes/api/todo-items";
 import { PROXY_ORIGIN } from "@/PROXY_ORIGIN";
+import type { TodoItemCreateDataType } from "@/routes/api/todo-items";
 
 const todoItemSchema = z.object({
   id: z.string(),
@@ -40,7 +40,17 @@ export const todoItemsCollection = createCollection(
         throw new Error("Failed to insert todo item");
       }
 
-      return;
+      const jsonRes = await res.json();
+
+      const { txid } = z
+        .object({
+          txid: z.number(),
+        })
+        .parse(jsonRes);
+
+      return {
+        txid,
+      };
     },
     onDelete: async ({ transaction }) => {
       const { original } = transaction.mutations[0];
@@ -56,7 +66,17 @@ export const todoItemsCollection = createCollection(
         throw new Error("Failed to delete todo item");
       }
 
-      return;
+      const jsonRes = await res.json();
+
+      const { txid } = z
+        .object({
+          txid: z.number(),
+        })
+        .parse(jsonRes);
+
+      return {
+        txid,
+      };
     },
     onUpdate: async ({ transaction }) => {
       const { modified } = transaction.mutations[0];
@@ -79,7 +99,17 @@ export const todoItemsCollection = createCollection(
         throw new Error("Failed to update todo item");
       }
 
-      return;
+      const jsonRes = await res.json();
+
+      const { txid } = z
+        .object({
+          txid: z.number(),
+        })
+        .parse(jsonRes);
+
+      return {
+        txid,
+      };
     },
     getKey: (item) => item.id,
   }),

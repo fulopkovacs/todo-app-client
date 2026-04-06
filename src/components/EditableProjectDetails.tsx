@@ -1,10 +1,7 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
-import { CheckIcon, Edit2Icon, RotateCwIcon } from "lucide-react";
-import { useEffect, useState } from "react";
-import {
-  ProjectsNotFoundFromAPIError,
-  projectsCollection,
-} from "@/collections/projects";
+import { CheckIcon, Edit2Icon } from "lucide-react";
+import { useState } from "react";
+import { projectsCollection } from "@/collections/projects";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -64,34 +61,10 @@ function EditProjectNamePopover({ name, id }: { name: string; id: string }) {
   );
 }
 
-function ProjectsNotFoundFromAPIErrorMessage() {
-  return (
-    <div className="flex flex-col gap-10">
-      <p className="text-destructive-foreground">Error: API returned a 404.</p>
-      <div className="flex gap-4 flex-col text-muted-foreground">
-        <p>
-          We use a service worker to simulate the backend APi. Sometimes it's
-          not working properly, typically after a hard refresh of the page.
-        </p>
-        <p>Please try refreshing the page by clicking the button below!</p>
-      </div>
-      <Button
-        className="grow-0 shrink w-fit mx-auto"
-        onClick={() => {
-          window.location.reload();
-        }}
-      >
-        <RotateCwIcon /> Refresh page
-      </Button>
-    </div>
-  );
-}
-
 export function EditableProjectDetails({ projectId }: { projectId: string }) {
   const {
     data: [project],
     isLoading,
-    isReady,
   } = useLiveQuery(
     (q) =>
       q
@@ -100,38 +73,7 @@ export function EditableProjectDetails({ projectId }: { projectId: string }) {
     [projectId],
   );
 
-  const [notFoundErrorMessageVisible, setNotFoundErrorMessageVisible] =
-    useState(false);
-
-  useEffect(() => {
-    if (!project && isReady) {
-      /*
-        NOTE:
-        Sometimes typically after a hard refresh), the service worker
-        is not able to serve the API requests, and they all result in
-        404 errors. We need to tell the user that they should try
-        a normal refresh in these cases.
-
-        By default, query collection sync errors will not throw,
-        so we'll have to manually check if there's an error, when
-        the `isReady` flag is true.
-
-        https://tanstack.com/db/latest/docs/guides/error-handling#query-collection-sync-errors
-      */
-      const lastError = projectsCollection.utils.lastError;
-      if (lastError instanceof ProjectsNotFoundFromAPIError) {
-        setNotFoundErrorMessageVisible(true);
-      }
-    }
-  }, [project, isReady]);
-
-  return notFoundErrorMessageVisible ? (
-    /*
-      The API returned a 404 error when trying to sync the
-      projects collection.
-    */
-    <ProjectsNotFoundFromAPIErrorMessage />
-  ) : isReady && !project ? (
+  return !project ? (
     // The collection is ready, but no project was found
     // with this particular live query
     <div className="text-muted-foreground">

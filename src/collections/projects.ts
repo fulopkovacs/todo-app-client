@@ -3,16 +3,9 @@ import { electricCollectionOptions } from "@tanstack/electric-db-collection";
 import { createCollection } from "@tanstack/react-db";
 import { toast } from "sonner";
 import { z } from "zod";
+import { PROXY_ORIGIN } from "@/PROXY_ORIGIN";
 import type { ProjectUpdateData } from "@/routes/api/projects";
 import { projectErrorNames } from "@/utils/errorNames";
-import { PROXY_ORIGIN } from "@/PROXY_ORIGIN";
-
-export class ProjectsNotFoundFromAPIError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "ProjectsNotFoundError";
-  }
-}
 
 const projectSchema = z.object({
   id: z.string(),

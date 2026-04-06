@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import z from "zod";
 import { db } from "@/db";
 import { type TodoItemRecord, todoItemsTable } from "@/db/schema";
@@ -79,14 +79,24 @@ export const Route = createFileRoute("/api/todo-items")({
           return new Response("Description is required", { status: 400 });
         }
 
-        await db.insert(todoItemsTable).values({
-          ...newTodoItemData,
-          description,
-          createdAt: new Date(),
-          priority: 0,
-        } satisfies TodoItemRecord);
+        const { txid } = await db.transaction(async (tx) => {
+          await tx.insert(todoItemsTable).values({
+            ...newTodoItemData,
+            description,
+            createdAt: new Date(),
+            priority: 0,
+          } satisfies TodoItemRecord);
 
-        return new Response(null, { status: 201 });
+          const [{ txid }] = await tx.execute<{ txid: string }>(
+            sql`SELECT pg_current_xact_id()::xid::text AS txid`,
+          );
+
+          return {
+            txid: parseInt(txid),
+          };
+        });
+
+        return Response.json({ txid }, { status: 201 });
       },
       DELETE: async ({ request }) => {
         // biome-ignore lint/suspicious/noExplicitAny: it can be any here
@@ -104,16 +114,30 @@ export const Route = createFileRoute("/api/todo-items")({
           return new Response("Invalid request data", { status: 400 });
         }
 
-        const deleted = await db
-          .delete(todoItemsTable)
-          .where(eq(todoItemsTable.id, parsed.data.id))
-          .returning();
+        const deletedTxData = await db.transaction(async (tx) => {
+          const deleted = await tx
+            .delete(todoItemsTable)
+            .where(eq(todoItemsTable.id, parsed.data.id))
+            .returning({ id: todoItemsTable.id });
 
-        if (deleted.length === 0) {
+          if (deleted.length === 0) {
+            return null;
+          }
+
+          const [{ txid }] = await tx.execute<{ txid: string }>(
+            sql`SELECT pg_current_xact_id()::xid::text AS txid`,
+          );
+
+          return {
+            txid: parseInt(txid),
+          };
+        });
+
+        if (!deletedTxData) {
           return new Response("Todo item not found", { status: 404 });
         }
 
-        return new Response(null, { status: 204 });
+        return Response.json({ txid: deletedTxData.txid });
       },
       PATCH: async ({ request }) => {
         let updatedData: z.infer<typeof todoItemUpdateData>;
@@ -147,19 +171,31 @@ export const Route = createFileRoute("/api/todo-items")({
           return new Response("No columns to update", { status: 400 });
         }
 
-        const [updatedTodoItemData] = await db
-          .update(todoItemsTable)
-          .set(updatedData)
-          .where(eq(todoItemsTable.id, updatedData.id))
-          .returning();
+        const updatedTxData = await db.transaction(async (tx) => {
+          const [updatedTodoItemData] = await tx
+            .update(todoItemsTable)
+            .set(updatedData)
+            .where(eq(todoItemsTable.id, updatedData.id))
+            .returning({ id: todoItemsTable.id });
 
-        if (!updatedTodoItemData) {
+          if (!updatedTodoItemData) {
+            return null;
+          }
+
+          const [{ txid }] = await tx.execute<{ txid: string }>(
+            sql`SELECT pg_current_xact_id()::xid::text AS txid`,
+          );
+
+          return {
+            txid: parseInt(txid),
+          };
+        });
+
+        if (!updatedTxData) {
           return new Response("Todo item not found", { status: 404 });
         }
 
-        return new Response(JSON.stringify(updatedTodoItemData), {
-          headers: { "Content-Type": "application/json" },
-        });
+        return Response.json({ txid: updatedTxData.txid });
       },
     },
   },

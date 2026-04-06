@@ -40,7 +40,8 @@
         "noDocumentCookie": "off"
       },
       "correctness": {
-        "noChildrenProp": "off"
+        "noChildrenProp": "off",
+        "useParseIntRadix": "off"
       }
     }
   },

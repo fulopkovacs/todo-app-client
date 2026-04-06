@@ -1,8 +1,8 @@
-import { PROXY_ORIGIN } from "@/PROXY_ORIGIN";
 import { snakeCamelMapper } from "@electric-sql/client";
 import { electricCollectionOptions } from "@tanstack/electric-db-collection";
 import { createCollection } from "@tanstack/react-db";
 import { z } from "zod";
+import { PROXY_ORIGIN } from "@/PROXY_ORIGIN";
 
 const boardSchema = z.object({
   id: z.string(),
