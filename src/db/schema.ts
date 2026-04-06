@@ -78,7 +78,5 @@ export type TodoItemRecord = typeof todoItemsTable.$inferSelect;
 export const seedTable = pgTable("seed_script_runs", {
   id: text().primaryKey(), // nanoid
   createdAt,
-  // state: pgEnum("state", ["completed", "in_progress", "failed"])(),
-  // NOTE: pgEnum doesn't seem to work with pglite
   state: text("state"),
 });

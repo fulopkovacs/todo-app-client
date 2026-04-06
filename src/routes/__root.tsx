@@ -1,8 +1,6 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
-import type { QueryClient } from "@tanstack/react-query";
-import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import {
-  createRootRouteWithContext,
+  createRootRoute,
   HeadContent,
   redirect,
   Scripts,
@@ -16,11 +14,7 @@ import { getIsMobile } from "@/server/functions/getIsMobile";
 import { seo } from "@/utils/seo";
 import appCss from "../styles.css?url";
 
-interface MyRouterContext {
-  queryClient: QueryClient;
-}
-
-export const Route = createRootRouteWithContext<MyRouterContext>()({
+export const Route = createRootRoute({
   beforeLoad: async ({ location }) => {
     // Skip redirect if already on /mobile to avoid infinite loop
     if (location.pathname === "/mobile") {
@@ -125,11 +119,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             position: "bottom-right",
           }}
           plugins={[
-            {
-              name: "TanStack Query",
-              render: <ReactQueryDevtoolsPanel />,
-              defaultOpen: true,
-            },
             {
               name: "TanStack Router",
               render: <TanStackRouterDevtoolsPanel />,
