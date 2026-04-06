@@ -21,6 +21,7 @@
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
+    "@electric-sql/client": "^1.5.13",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -38,7 +39,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/db": "^0.5.33",
-    "@tanstack/query-db-collection": "^1.0.30",
+    "@tanstack/electric-db-collection": "^0.2.41",
     "@tanstack/react-db": "^0.1.77",
     "@tanstack/react-devtools": "^0.9.0",
     "@tanstack/react-form": "^1.25.0",

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
 import { projectsTable } from "@/db/schema";
@@ -61,17 +61,32 @@ export const Route = createFileRoute("/api/projects")({
         try {
           const { id: _id, ...updateFields } = updatedData;
 
-          const [updated] = await db
-            .update(projectsTable)
-            .set(updateFields)
-            .where(eq(projectsTable.id, updatedData.id))
-            .returning({ id: projectsTable.id });
+          const { txid, updated } = await db.transaction(async (tx) => {
+            const [updated] = await db
+              .update(projectsTable)
+              .set(updateFields)
+              .where(eq(projectsTable.id, updatedData.id))
+              .returning({ id: projectsTable.id });
+
+            const [{ txid }] = await tx.execute<{ txid: string }>(
+              sql`SELECT pg_current_xact_id()::xid::text AS txid`,
+            );
+
+            return {
+              txid: parseInt(txid),
+              updated,
+            };
+          });
 
           if (!updated) {
             return new Response(`Project not found: ${updatedData.id}`, {
               status: 404,
             });
           }
+
+          return Response.json({
+            txid,
+          });
         } catch (error) {
           if (
             error instanceof Error &&
@@ -91,8 +106,6 @@ export const Route = createFileRoute("/api/projects")({
             { status: 500 },
           );
         }
-
-        return new Response(null, { status: 204 });
       },
     },
   },

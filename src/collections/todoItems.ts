@@ -1,9 +1,10 @@
-import { queryCollectionOptions } from "@tanstack/query-db-collection";
+import { snakeCamelMapper } from "@electric-sql/client";
+import { electricCollectionOptions } from "@tanstack/electric-db-collection";
 import { createCollection } from "@tanstack/react-db";
 import { toast } from "sonner";
 import { z } from "zod";
-import { queryCollectionClient } from "@/collections/queryClient";
 import type { TodoItemCreateDataType } from "@/routes/api/todo-items";
+import { PROXY_ORIGIN } from "@/PROXY_ORIGIN";
 
 const todoItemSchema = z.object({
   id: z.string(),
@@ -17,19 +18,13 @@ const todoItemSchema = z.object({
 });
 
 export const todoItemsCollection = createCollection(
-  queryCollectionOptions({
+  electricCollectionOptions({
     id: "todo-items",
-    queryKey: ["todo-items"],
-    queryClient: queryCollectionClient,
-    queryFn: async () => {
-      const res = await fetch("/api/todo-items");
-
-      if (!res.ok) {
-        toast.error("Failed to fetch todo items");
-        throw new Error("Failed to fetch todo items");
-      }
-
-      return z.array(todoItemSchema).parse(await res.json());
+    schema: todoItemSchema,
+    shapeOptions: {
+      url: `${PROXY_ORIGIN}/api/electric/todo_items`,
+      parser: { timestamptz: (v: string) => new Date(v) },
+      columnMapper: snakeCamelMapper(),
     },
     onInsert: async ({ transaction }) => {
       const { modified: newTodoItem } = transaction.mutations[0];

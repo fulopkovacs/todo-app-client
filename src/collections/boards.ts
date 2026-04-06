@@ -1,8 +1,8 @@
-import { queryCollectionOptions } from "@tanstack/query-db-collection";
+import { PROXY_ORIGIN } from "@/PROXY_ORIGIN";
+import { snakeCamelMapper } from "@electric-sql/client";
+import { electricCollectionOptions } from "@tanstack/electric-db-collection";
 import { createCollection } from "@tanstack/react-db";
-import { toast } from "sonner";
 import { z } from "zod";
-import { queryCollectionClient } from "@/collections/queryClient";
 
 const boardSchema = z.object({
   id: z.string(),
@@ -13,19 +13,13 @@ const boardSchema = z.object({
 });
 
 export const boardCollection = createCollection(
-  queryCollectionOptions({
+  electricCollectionOptions({
     id: "boards",
-    queryKey: ["boards"],
-    queryClient: queryCollectionClient,
-    queryFn: async () => {
-      const res = await fetch("/api/boards");
-
-      if (!res.ok) {
-        toast.error("Failed to fetch boards");
-        throw new Error("Failed to fetch boards");
-      }
-
-      return z.array(boardSchema).parse(await res.json());
+    schema: boardSchema,
+    shapeOptions: {
+      url: `${PROXY_ORIGIN}/api/electric/boards`,
+      parser: { timestamptz: (v: string) => new Date(v) },
+      columnMapper: snakeCamelMapper(),
     },
     getKey: (item) => item.id,
   }),

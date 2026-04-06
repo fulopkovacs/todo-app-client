@@ -1,10 +1,11 @@
-import { queryCollectionOptions } from "@tanstack/query-db-collection";
+import { snakeCamelMapper } from "@electric-sql/client";
+import { electricCollectionOptions } from "@tanstack/electric-db-collection";
 import { createCollection } from "@tanstack/react-db";
 import { toast } from "sonner";
 import { z } from "zod";
-import { queryCollectionClient } from "@/collections/queryClient";
 import type { ProjectUpdateData } from "@/routes/api/projects";
 import { projectErrorNames } from "@/utils/errorNames";
+import { PROXY_ORIGIN } from "@/PROXY_ORIGIN";
 
 export class ProjectsNotFoundFromAPIError extends Error {
   constructor(message: string) {
@@ -21,26 +22,13 @@ const projectSchema = z.object({
 });
 
 export const projectsCollection = createCollection(
-  queryCollectionOptions({
+  electricCollectionOptions({
     id: "projects",
-    queryKey: ["projects"],
-    queryClient: queryCollectionClient,
-    queryFn: async () => {
-      const res = await fetch("/api/projects");
-
-      if (res.status === 404) {
-        toast.error("Projects not found");
-        throw new ProjectsNotFoundFromAPIError(
-          "Projects endpoint returned 404",
-        );
-      }
-
-      if (!res.ok) {
-        toast.error("Failed to fetch projects");
-        throw new Error("Failed to fetch projects");
-      }
-
-      return z.array(projectSchema).parse(await res.json());
+    schema: projectSchema,
+    shapeOptions: {
+      url: `${PROXY_ORIGIN}/api/electric/projects`,
+      parser: { timestamptz: (v: string) => new Date(v) },
+      columnMapper: snakeCamelMapper(),
     },
     onUpdate: async ({ transaction }) => {
       const { original, changes } = transaction.mutations[0];
@@ -60,7 +48,17 @@ export const projectsCollection = createCollection(
           throw new Error(errorData);
         }
 
-        return;
+        const jsonRes = await res.json();
+
+        const { txid } = z
+          .object({
+            txid: z.number(),
+          })
+          .parse(jsonRes);
+
+        return {
+          txid,
+        };
       } catch (error) {
         if (
           error instanceof Error &&
