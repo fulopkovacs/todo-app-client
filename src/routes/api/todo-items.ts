@@ -38,14 +38,10 @@ export const Route = createFileRoute("/api/todo-items")({
             .select()
             .from(todoItemsTable)
             .where(eq(todoItemsTable.projectId, projectId));
-          return new Response(JSON.stringify(results), {
-            headers: { "Content-Type": "application/json" },
-          });
+          return Response.json(results);
         }
         const results = await db.select().from(todoItemsTable);
-        return new Response(JSON.stringify(results), {
-          headers: { "Content-Type": "application/json" },
-        });
+        return Response.json(results);
       },
       POST: async ({ request }) => {
         let newTodoItemData: z.infer<typeof todoItemCreateData>;

@@ -8,9 +8,7 @@ export const Route = createFileRoute("/api/boards")({
       GET: async () => {
         const results = await db.select().from(boardsTable);
 
-        return new Response(JSON.stringify(results), {
-          headers: { "Content-Type": "application/json" },
-        });
+        return Response.json(results);
       },
     },
   },

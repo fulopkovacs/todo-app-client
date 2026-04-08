@@ -22,9 +22,7 @@ export const Route = createFileRoute("/api/projects")({
           .from(projectsTable)
           .orderBy(asc(projectsTable.createdAt));
 
-        return new Response(JSON.stringify(results), {
-          headers: { "Content-Type": "application/json" },
-        });
+        return Response.json(results);
       },
       PATCH: async ({ request }) => {
         let updatedData: z.infer<typeof projectUpdateData>;
