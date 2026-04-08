@@ -26,7 +26,7 @@ export const todoItemsCollection = createCollection(
       parser: { timestamptz: (v: string) => new Date(v) },
       columnMapper: snakeCamelMapper(),
     },
-    onInsert: async ({ transaction }) => {
+    onInsert: async ({ transaction, collection }) => {
       const { modified: newTodoItem } = transaction.mutations[0];
 
       const res = await fetch("/api/todo-items", {
@@ -48,11 +48,9 @@ export const todoItemsCollection = createCollection(
         })
         .parse(jsonRes);
 
-      return {
-        txid,
-      };
+      await collection.utils.awaitTxId(txid);
     },
-    onDelete: async ({ transaction }) => {
+    onDelete: async ({ transaction, collection }) => {
       const { original } = transaction.mutations[0];
 
       const res = await fetch("/api/todo-items", {
@@ -74,11 +72,9 @@ export const todoItemsCollection = createCollection(
         })
         .parse(jsonRes);
 
-      return {
-        txid,
-      };
+      await collection.utils.awaitTxId(txid);
     },
-    onUpdate: async ({ transaction }) => {
+    onUpdate: async ({ transaction, collection }) => {
       const { modified } = transaction.mutations[0];
 
       const res = await fetch("/api/todo-items", {
@@ -107,9 +103,7 @@ export const todoItemsCollection = createCollection(
         })
         .parse(jsonRes);
 
-      return {
-        txid,
-      };
+      await collection.utils.awaitTxId(txid);
     },
     getKey: (item) => item.id,
   }),

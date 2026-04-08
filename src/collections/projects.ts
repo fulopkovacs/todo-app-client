@@ -23,7 +23,7 @@ export const projectsCollection = createCollection(
       parser: { timestamptz: (v: string) => new Date(v) },
       columnMapper: snakeCamelMapper(),
     },
-    onUpdate: async ({ transaction }) => {
+    onUpdate: async ({ transaction, collection }) => {
       const { original, changes } = transaction.mutations[0];
       try {
         const res = await fetch("/api/projects", {
@@ -49,9 +49,7 @@ export const projectsCollection = createCollection(
           })
           .parse(jsonRes);
 
-        return {
-          txid,
-        };
+        await collection.utils.awaitTxId(txid);
       } catch (error) {
         if (
           error instanceof Error &&
