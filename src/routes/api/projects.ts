@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { asc, eq, sql } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
 import { projectsTable } from "@/db/schema";
@@ -22,9 +22,7 @@ export const Route = createFileRoute("/api/projects")({
           .from(projectsTable)
           .orderBy(asc(projectsTable.createdAt));
 
-        return new Response(JSON.stringify(results), {
-          headers: { "Content-Type": "application/json" },
-        });
+        return Response.json(results);
       },
       PATCH: async ({ request }) => {
         let updatedData: z.infer<typeof projectUpdateData>;
@@ -58,27 +56,20 @@ export const Route = createFileRoute("/api/projects")({
           return new Response("No columns to update", { status: 400 });
         }
 
-        let txid: number | undefined;
-
         try {
           const { id: _id, ...updateFields } = updatedData;
 
-          await db.transaction(async (tx) => {
-            const [updated] = await tx
-              .update(projectsTable)
-              .set(updateFields)
-              .where(eq(projectsTable.id, updatedData.id))
-              .returning({ id: projectsTable.id });
+          const [updated] = await db
+            .update(projectsTable)
+            .set(updateFields)
+            .where(eq(projectsTable.id, updatedData.id))
+            .returning({ id: projectsTable.id });
 
-            if (!updated) {
-              throw new Error(`Project not found: ${updatedData.id}`);
-            }
+          if (!updated) {
+            throw new Error(`Project not found: ${updatedData.id}`);
+          }
 
-            const [txResult] = await tx.execute<{ txid: string }>(
-              sql`SELECT pg_current_xact_id()::text as txid`,
-            );
-            txid = Number(txResult.txid);
-          });
+          return Response.json({ updated });
         } catch (error) {
           if (
             error instanceof Error &&
@@ -98,10 +89,6 @@ export const Route = createFileRoute("/api/projects")({
             { status: 500 },
           );
         }
-
-        return new Response(JSON.stringify({ txid }), {
-          headers: { "Content-Type": "application/json" },
-        });
       },
     },
   },

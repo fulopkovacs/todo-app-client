@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import z from "zod";
 import { db } from "@/db";
 import { type TodoItemRecord, todoItemsTable } from "@/db/schema";
@@ -38,14 +38,10 @@ export const Route = createFileRoute("/api/todo-items")({
             .select()
             .from(todoItemsTable)
             .where(eq(todoItemsTable.projectId, projectId));
-          return new Response(JSON.stringify(results), {
-            headers: { "Content-Type": "application/json" },
-          });
+          return Response.json(results);
         }
         const results = await db.select().from(todoItemsTable);
-        return new Response(JSON.stringify(results), {
-          headers: { "Content-Type": "application/json" },
-        });
+        return Response.json(results);
       },
       POST: async ({ request }) => {
         let newTodoItemData: z.infer<typeof todoItemCreateData>;
@@ -79,25 +75,15 @@ export const Route = createFileRoute("/api/todo-items")({
           return new Response("Description is required", { status: 400 });
         }
 
-        let txid: number | undefined;
+        await db.insert(todoItemsTable).values({
+          ...newTodoItemData,
+          description,
+          createdAt: new Date(),
+          priority: 0,
+        } satisfies TodoItemRecord);
 
-        await db.transaction(async (tx) => {
-          await tx.insert(todoItemsTable).values({
-            ...newTodoItemData,
-            description,
-            createdAt: new Date(),
-            priority: 0,
-          } satisfies TodoItemRecord);
-
-          const [result] = await tx.execute<{ txid: string }>(
-            sql`SELECT pg_current_xact_id()::text as txid`,
-          );
-          txid = Number(result.txid);
-        });
-
-        return new Response(JSON.stringify({ txid }), {
+        return new Response("ok", {
           status: 201,
-          headers: { "Content-Type": "application/json" },
         });
       },
       DELETE: async ({ request }) => {
@@ -116,31 +102,16 @@ export const Route = createFileRoute("/api/todo-items")({
           return new Response("Invalid request data", { status: 400 });
         }
 
-        let txid: number | undefined;
+        const deleted = await db
+          .delete(todoItemsTable)
+          .where(eq(todoItemsTable.id, parsed.data.id))
+          .returning();
 
-        await db.transaction(async (tx) => {
-          const deleted = await tx
-            .delete(todoItemsTable)
-            .where(eq(todoItemsTable.id, parsed.data.id))
-            .returning();
-
-          if (deleted.length === 0) {
-            throw new Error("Todo item not found");
-          }
-
-          const [txResult] = await tx.execute<{ txid: string }>(
-            sql`SELECT pg_current_xact_id()::text as txid`,
-          );
-          txid = Number(txResult.txid);
-        });
-
-        if (txid === undefined) {
-          return new Response("Todo item not found", { status: 404 });
+        if (deleted.length === 0) {
+          throw new Error("Todo item not found");
         }
 
-        return new Response(JSON.stringify({ txid }), {
-          headers: { "Content-Type": "application/json" },
-        });
+        return Response.json({ deletedId: parsed.data.id });
       },
       PATCH: async ({ request }) => {
         let updatedData: z.infer<typeof todoItemUpdateData>;
@@ -174,30 +145,17 @@ export const Route = createFileRoute("/api/todo-items")({
           return new Response("No columns to update", { status: 400 });
         }
 
-        let txid: number | undefined;
-        let updatedTodoItemData: TodoItemRecord | undefined;
-
-        await db.transaction(async (tx) => {
-          const [result] = await tx
-            .update(todoItemsTable)
-            .set(updatedData)
-            .where(eq(todoItemsTable.id, updatedData.id))
-            .returning();
-          updatedTodoItemData = result;
-
-          const [txResult] = await tx.execute<{ txid: string }>(
-            sql`SELECT pg_current_xact_id()::text as txid`,
-          );
-          txid = Number(txResult.txid);
-        });
+        const [updatedTodoItemData] = await db
+          .update(todoItemsTable)
+          .set(updatedData)
+          .where(eq(todoItemsTable.id, updatedData.id))
+          .returning();
 
         if (!updatedTodoItemData) {
           return new Response("Todo item not found", { status: 404 });
         }
 
-        return new Response(JSON.stringify({ txid, ...updatedTodoItemData }), {
-          headers: { "Content-Type": "application/json" },
-        });
+        return Response.json(updatedTodoItemData);
       },
     },
   },

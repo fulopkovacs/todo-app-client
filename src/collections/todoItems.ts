@@ -44,9 +44,6 @@ export const todoItemsCollection = createCollection(
         toast.error(`Failed to insert todo item "${newTodoItem.title}"`);
         throw new Error("Failed to insert todo item");
       }
-
-      const data: { txid: number } = await res.json();
-      return { txid: data.txid };
     },
     onDelete: async ({ transaction }) => {
       const { original } = transaction.mutations[0];
@@ -85,9 +82,6 @@ export const todoItemsCollection = createCollection(
         toast.error(`Failed to update todo item "${modified.title}"`);
         throw new Error("Failed to update todo item");
       }
-
-      const data: { txid: number } = await res.json();
-      return { txid: data.txid };
     },
     getKey: (item) => item.id,
   }),

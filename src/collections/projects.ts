@@ -59,9 +59,6 @@ export const projectsCollection = createCollection(
           toast.error(`Failed to update project "${original.name}"`);
           throw new Error(errorData);
         }
-
-        const data: { txid: number } = await res.json();
-        return { txid: data.txid };
       } catch (error) {
         if (
           error instanceof Error &&
